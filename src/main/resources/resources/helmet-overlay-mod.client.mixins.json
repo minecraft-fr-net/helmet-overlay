@@ -3,7 +3,7 @@
 	"package": "net.minecraftfr.helmetoverlaymod.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"InGameHudMixin"
+		"ExampleClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
