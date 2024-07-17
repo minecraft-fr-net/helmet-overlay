@@ -1,4 +1,4 @@
-package net.minecraftfr.helmetoverlaymod.mixin.client;
+package net.minecraftfr.helmetoverlay.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;

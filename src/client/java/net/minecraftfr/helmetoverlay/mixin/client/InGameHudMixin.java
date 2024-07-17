@@ -1,4 +1,4 @@
-package net.minecraftfr.helmetoverlaymod.mixin.client;
+package net.minecraftfr.helmetoverlay.mixin.client;
 
 import java.io.IOException;
 import java.util.Optional;

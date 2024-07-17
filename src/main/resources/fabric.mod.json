@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "helmet-overlay-mod",
+	"id": "helmet-overlay",
 	"version": "${version}",
 	"name": "Helmet Overlay Mod",
 	"description": "This is an example description! Tell everyone what your mod is about!",
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/helmet-overlay-mod/icon.png",
+	"icon": "assets/helmet-overlay/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.minecraftfr.helmetoverlaymod.HelmetOverlayMod"
+			"net.minecraftfr.helmetoverlay.HelmetOverlay"
 		],
 		"client": [
-			"net.minecraftfr.helmetoverlaymod.HelmetOverlayModClient"
+			"net.minecraftfr.helmetoverlay.HelmetOverlayClient"
 		]
 	},
 	"mixins": [
-		"helmet-overlay-mod.mixins.json",
+		"helmet-overlay.mixins.json",
 		{
-			"config": "helmet-overlay-mod.client.mixins.json",
+			"config": "helmet-overlay.client.mixins.json",
 			"environment": "client"
 		}
 	],

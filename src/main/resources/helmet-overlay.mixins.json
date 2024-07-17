@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "net.minecraftfr.helmetoverlaymod.mixin",
+	"package": "net.minecraftfr.helmetoverlay.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ExampleMixin"

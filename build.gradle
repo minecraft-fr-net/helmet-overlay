@@ -22,7 +22,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"helmet-overlay-mod" {
+		"helmet-overlay" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

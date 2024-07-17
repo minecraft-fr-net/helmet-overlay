@@ -1,4 +1,4 @@
-package net.minecraftfr.helmetoverlaymod.mixin;
+package net.minecraftfr.helmetoverlay.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
