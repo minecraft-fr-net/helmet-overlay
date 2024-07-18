@@ -31,7 +31,7 @@ public class InGameHudMixin {
     if (client != null && client.player != null && client.options.getPerspective().isFirstPerson()) {
       ItemStack helmet = getHelmetFromPlayer(client.player);
       if (!helmet.isEmpty()) {
-        Identifier identifier = getHelmeIdentifier(helmet) {
+        Identifier identifier = getHelmeIdentifier(helmet);
 
         if (resourceExists(identifier)) {
           renderOverlay(context, identifier, 1.0F);
