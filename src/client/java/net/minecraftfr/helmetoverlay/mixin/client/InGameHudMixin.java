@@ -13,7 +13,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -27,17 +29,27 @@ public class InGameHudMixin {
     MinecraftClient client = MinecraftClient.getInstance();
 
     if (client != null && client.player != null && client.options.getPerspective().isFirstPerson()) {
-      ItemStack helmet = client.player.getEquippedStack(EquipmentSlot.HEAD);
+      ItemStack helmet = getHelmetFromPlayer(client.player);
       if (!helmet.isEmpty()) {
-        String helmet_texture_name = Registries.ITEM.getId(helmet.getItem()).getPath();
-        String texture_path = "textures/misc/" + helmet_texture_name + "_overlay.png";
-        Identifier identifier = new Identifier("minecraft", texture_path);
+        Identifier identifier = getHelmeIdentifier(helmet) {
 
         if (resourceExists(identifier)) {
           renderOverlay(context, identifier, 1.0F);
         }
       }
     }
+  }
+
+  private ItemStack getHelmetFromPlayer(ClientPlayerEntity player) {
+    return player.getEquippedStack(EquipmentSlot.HEAD);
+  }
+
+  private Identifier getHelmeIdentifier(ItemStack helmet) {
+    String helmet_texture_name = Registries.ITEM.getId(helmet.getItem()).getPath();
+    String texture_path = "textures/misc/" + helmet_texture_name + "_overlay.png";
+    Identifier identifier = new Identifier("minecraft", texture_path);
+
+    return identifier;
   }
 
   private boolean resourceExists(Identifier identifier) {
@@ -50,6 +62,7 @@ public class InGameHudMixin {
     }
   }
 
+  // Copy of InGameHud#renderOverlay
   private void renderOverlay(DrawContext context, Identifier texture, float opacity) {
     RenderSystem.disableDepthTest();
     RenderSystem.depthMask(false);
