@@ -1,6 +1,5 @@
 package net.minecraftfr.helmetoverlay.mixin.client;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
