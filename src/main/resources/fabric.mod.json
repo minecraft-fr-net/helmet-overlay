@@ -3,9 +3,9 @@
 	"id": "helmet-overlay",
 	"version": "${version}",
 	"name": "Helmet Overlay Mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "This mod adds an overlay when a player wears a helmet, creating a visual effect that simulates the experience of actually wearing a helmet. This immersive feature enhances realism by displaying the helmet's perspective on the screen.",
 	"authors": [
-		"Me!"
+		"cprodhomme"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
