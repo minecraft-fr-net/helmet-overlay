@@ -46,7 +46,7 @@ public class InGameHudMixin {
   private Identifier getHelmeIdentifier(ItemStack helmet) {
     String helmet_texture_name = Registries.ITEM.getId(helmet.getItem()).getPath();
     String texture_path = "textures/misc/" + helmet_texture_name + "_overlay.png";
-    Identifier identifier = Identifier.of("minecraft", texture_path);
+    Identifier identifier = Identifier.ofVanilla(texture_path);
 
     return identifier;
   }
