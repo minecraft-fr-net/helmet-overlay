@@ -15,9 +15,6 @@
 	"icon": "assets/helmet-overlay/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"net.minecraftfr.helmetoverlay.HelmetOverlay"
-		],
 		"client": [
 			"net.minecraftfr.helmetoverlay.HelmetOverlayClient"
 		]
