@@ -13,6 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -23,7 +24,7 @@ import net.minecraft.util.Identifier;
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
   @Inject(method = "renderMiscOverlays", at = @At("HEAD"))
-  public void renderMiscOverlays(DrawContext context, float tickDelta, CallbackInfo ci) {
+  public void renderMiscOverlays(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
     MinecraftClient client = MinecraftClient.getInstance();
 
     if (client != null && client.player != null && client.options.getPerspective().isFirstPerson()) {
