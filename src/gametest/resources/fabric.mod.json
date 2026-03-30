@@ -5,16 +5,13 @@
 	"name": "Helmet Overlay Game Tests",
 	"environment": "*",
 	"entrypoints": {
-		"fabric-gametest": [
-			"net.minecraftfr.helmetoverlay.gametest.HelmetOverlayGameTest"
-		],
 		"fabric-client-gametest": [
 			"net.minecraftfr.helmetoverlay.gametest.HelmetOverlayClientGameTest"
 		]
 	},
 	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.21.4",
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.6",
 		"java": ">=21",
 		"fabric-api": "*",
 		"helmet-overlay": "*"

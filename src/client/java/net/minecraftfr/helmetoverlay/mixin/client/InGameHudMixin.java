@@ -7,13 +7,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -63,16 +61,10 @@ public class InGameHudMixin {
   }
 
   private void renderOverlay(DrawContext context, Identifier texture, float opacity) {
-    RenderSystem.disableDepthTest();
-    RenderSystem.depthMask(false);
-    RenderSystem.enableBlend();
     int width = context.getScaledWindowWidth();
     int height = context.getScaledWindowHeight();
     int alpha = Math.min(255, Math.max(0, (int) (opacity * 255.0F)));
     int color = (alpha << 24) | 0xFFFFFF;
-    context.drawTexture(RenderLayer::getGuiTextured, texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
-    RenderSystem.disableBlend();
-    RenderSystem.depthMask(true);
-    RenderSystem.enableDepthTest();
+    context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
   }
 }
