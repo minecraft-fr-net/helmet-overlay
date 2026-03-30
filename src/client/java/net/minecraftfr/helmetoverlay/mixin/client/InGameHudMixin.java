@@ -13,6 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -61,16 +62,17 @@ public class InGameHudMixin {
     }
   }
 
-  // Copy of InGameHud#renderOverlay
   private void renderOverlay(DrawContext context, Identifier texture, float opacity) {
     RenderSystem.disableDepthTest();
     RenderSystem.depthMask(false);
     RenderSystem.enableBlend();
-    context.setShaderColor(1.0F, 1.0F, 1.0F, opacity);
-    context.drawTexture(texture, 0, 0, -90, 0.0F, 0.0F, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight());
+    int width = context.getScaledWindowWidth();
+    int height = context.getScaledWindowHeight();
+    int alpha = Math.min(255, Math.max(0, (int) (opacity * 255.0F)));
+    int color = (alpha << 24) | 0xFFFFFF;
+    context.drawTexture(RenderLayer::getGuiTextured, texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
     RenderSystem.disableBlend();
     RenderSystem.depthMask(true);
     RenderSystem.enableDepthTest();
-    context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
   }
 }

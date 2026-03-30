@@ -1,0 +1,22 @@
+{
+	"schemaVersion": 1,
+	"id": "helmet-overlay-gametest",
+	"version": "1.0.0",
+	"name": "Helmet Overlay Game Tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-gametest": [
+			"net.minecraftfr.helmetoverlay.gametest.HelmetOverlayGameTest"
+		],
+		"fabric-client-gametest": [
+			"net.minecraftfr.helmetoverlay.gametest.HelmetOverlayClientGameTest"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*",
+		"helmet-overlay": "*"
+	}
+}
