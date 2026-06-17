@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+cd "$(git rev-parse --show-toplevel)"
+
+# --- Version actuelle ---
+CURRENT_MOD_VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2-)
+MC_VERSION=$(echo "$CURRENT_MOD_VERSION" | cut -d+ -f2-)
+CURRENT_SEM=$(echo "$CURRENT_MOD_VERSION" | cut -d+ -f1)
+IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_SEM"
+
+echo -e "${BOLD}Version actuelle :${NC} ${BLUE}$CURRENT_SEM${NC} (Minecraft $MC_VERSION)"
+echo ""
+
+# --- Choix du type de bump ---
+echo -e "${YELLOW}Quel type de release ?${NC}"
+echo -e "  ${BOLD}1) major${NC}  $MAJOR.$MINOR.$PATCH → $((MAJOR + 1)).0.0"
+echo -e "  ${BOLD}2) minor${NC}  $MAJOR.$MINOR.$PATCH → $MAJOR.$((MINOR + 1)).0"
+echo -e "  ${BOLD}3) patch${NC}  $MAJOR.$MINOR.$PATCH → $MAJOR.$MINOR.$((PATCH + 1))"
+echo ""
+read -rp "Choix [1/2/3] : " CHOICE
+
+case "$CHOICE" in
+  1) NEW_SEM="$((MAJOR + 1)).0.0" ;;
+  2) NEW_SEM="$MAJOR.$((MINOR + 1)).0" ;;
+  3) NEW_SEM="$MAJOR.$MINOR.$((PATCH + 1))" ;;
+  *) echo -e "${RED}Choix invalide.${NC}"; exit 1 ;;
+esac
+
+NEW_MOD_VERSION="$NEW_SEM+$MC_VERSION"
+TAG="V$NEW_SEM"
+
+echo ""
+echo -e "  mod_version  : ${GREEN}$NEW_MOD_VERSION${NC}"
+echo -e "  tag git      : ${GREEN}$TAG${NC}"
+echo ""
+read -rp "Confirmer ? [o/N] " CONFIRM
+[[ "$CONFIRM" =~ ^[oO]$ ]] || { echo "Annulé."; exit 0; }
+echo ""
+
+# --- Commits depuis le dernier tag ---
+LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+if [ -n "$LAST_TAG" ]; then
+  COMMITS=$(git log "${LAST_TAG}..HEAD" --pretty=format:"- %s" --no-merges)
+else
+  COMMITS=$(git log --pretty=format:"- %s" --no-merges)
+fi
+
+if [ -z "$COMMITS" ]; then
+  COMMITS="- Pas de changement notable"
+fi
+
+# --- Mise à jour de gradle.properties ---
+TMPFILE=$(mktemp)
+sed "s/^mod_version=.*/mod_version=$NEW_MOD_VERSION/" gradle.properties > "$TMPFILE"
+mv "$TMPFILE" gradle.properties
+echo -e "${GREEN}✓${NC} gradle.properties mis à jour"
+
+# --- Mise à jour de CHANGELOG.md ---
+CHANGELOG_ENTRY="## $NEW_MOD_VERSION
+
+$COMMITS
+"
+TMPFILE=$(mktemp)
+printf '%s\n' "$CHANGELOG_ENTRY" > "$TMPFILE"
+cat CHANGELOG.md >> "$TMPFILE"
+mv "$TMPFILE" CHANGELOG.md
+echo -e "${GREEN}✓${NC} CHANGELOG.md mis à jour"
+
+# --- Commit ---
+git add gradle.properties CHANGELOG.md
+git commit -m "🔖 Version $NEW_MOD_VERSION"
+echo -e "${GREEN}✓${NC} Commit créé"
+
+# --- Tag ---
+git tag "$TAG"
+echo -e "${GREEN}✓${NC} Tag $TAG créé"
+
+# --- Push ---
+echo ""
+read -rp "Pousser vers origin (git push + tags) ? [o/N] " PUSH
+if [[ "$PUSH" =~ ^[oO]$ ]]; then
+  git push && git push origin "$TAG"
+  echo -e "${GREEN}✓${NC} Poussé vers origin"
+  echo ""
+  echo -e "${BOLD}${GREEN}Release $NEW_MOD_VERSION publiée !${NC}"
+  echo -e "Le workflow GitHub Actions va publier automatiquement sur Modrinth et GitHub Releases."
+else
+  echo ""
+  echo -e "${BOLD}${GREEN}Release $NEW_MOD_VERSION prête en local.${NC}"
+  echo -e "Pour publier : ${BLUE}git push && git push origin $TAG${NC}"
+fi
