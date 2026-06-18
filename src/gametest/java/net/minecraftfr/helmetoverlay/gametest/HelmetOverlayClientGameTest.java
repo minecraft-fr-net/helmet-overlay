@@ -3,8 +3,8 @@ package net.minecraftfr.helmetoverlay.gametest;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.Perspective;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
 
 @SuppressWarnings("UnstableApiUsage")
 public class HelmetOverlayClientGameTest implements FabricClientGameTest {
@@ -16,17 +16,17 @@ public class HelmetOverlayClientGameTest implements FabricClientGameTest {
 		context.getInput().resizeWindow(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
-			sp.getClientWorld().waitForChunksDownload();
-			sp.getClientWorld().waitForChunksRender();
+			sp.getClientLevel().waitForChunksDownload();
+			sp.getClientLevel().waitForChunksRender();
 
 			sp.getServer().runCommand("item replace entity @p armor.head with minecraft:iron_helmet");
 
-			context.runOnClient((MinecraftClient client) -> {
-				client.options.setPerspective(Perspective.FIRST_PERSON);
+			context.runOnClient((Minecraft client) -> {
+				client.options.setCameraType(CameraType.FIRST_PERSON);
 			});
 
 			context.waitTicks(20);
-			sp.getClientWorld().waitForChunksRender();
+			sp.getClientLevel().waitForChunksRender();
 
 			context.assertScreenshotEquals("iron_helmet_overlay");
 		}
