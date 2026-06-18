@@ -7,29 +7,29 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 
-@Mixin(InGameHud.class)
+@Mixin(Gui.class)
 public class InGameHudMixin {
-  @Inject(method = "renderMiscOverlays", at = @At("HEAD"))
-  public void renderMiscOverlays(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-    MinecraftClient client = MinecraftClient.getInstance();
+  @Inject(method = "extractRenderState", at = @At("HEAD"))
+  public void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+    Minecraft client = Minecraft.getInstance();
 
-    if (client != null && client.player != null && client.options.getPerspective().isFirstPerson()) {
+    if (client != null && client.player != null && client.options.getCameraType().isFirstPerson()) {
       ItemStack helmet = getHelmetFromPlayer(client.player);
       if (!helmet.isEmpty()) {
-        Identifier identifier = getHelmeIdentifier(helmet);
+        Identifier identifier = getHelmetIdentifier(helmet);
 
         if (resourceExists(identifier)) {
           renderOverlay(context, identifier, 1.0F);
@@ -38,20 +38,18 @@ public class InGameHudMixin {
     }
   }
 
-  private ItemStack getHelmetFromPlayer(ClientPlayerEntity player) {
-    return player.getEquippedStack(EquipmentSlot.HEAD);
+  private ItemStack getHelmetFromPlayer(LocalPlayer player) {
+    return player.getItemBySlot(EquipmentSlot.HEAD);
   }
 
-  private Identifier getHelmeIdentifier(ItemStack helmet) {
-    String helmet_texture_name = Registries.ITEM.getId(helmet.getItem()).getPath();
+  private Identifier getHelmetIdentifier(ItemStack helmet) {
+    String helmet_texture_name = BuiltInRegistries.ITEM.getKey(helmet.getItem()).getPath();
     String texture_path = "textures/misc/" + helmet_texture_name + "_overlay.png";
-    Identifier identifier = Identifier.ofVanilla(texture_path);
-
-    return identifier;
+    return Identifier.withDefaultNamespace(texture_path);
   }
 
   private boolean resourceExists(Identifier identifier) {
-    ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
+    ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
     try {
       Optional<Resource> resource = resourceManager.getResource(identifier);
       return resource.isPresent();
@@ -60,11 +58,11 @@ public class InGameHudMixin {
     }
   }
 
-  private void renderOverlay(DrawContext context, Identifier texture, float opacity) {
-    int width = context.getScaledWindowWidth();
-    int height = context.getScaledWindowHeight();
+  private void renderOverlay(GuiGraphicsExtractor context, Identifier texture, float opacity) {
+    int width = context.guiWidth();
+    int height = context.guiHeight();
     int alpha = Math.min(255, Math.max(0, (int) (opacity * 255.0F)));
     int color = (alpha << 24) | 0xFFFFFF;
-    context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
+    context.blit(RenderPipelines.GUI_TEXTURED, texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
   }
 }
