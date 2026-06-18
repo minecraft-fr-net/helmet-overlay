@@ -48,6 +48,10 @@ fabricApi {
 	}
 }
 
+afterEvaluate {
+	loom.runs.getByName("clientGameTest").vmArg("-Xmx2G")
+}
+
 processResources {
 	inputs.property "version", project.version
 
