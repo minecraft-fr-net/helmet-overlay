@@ -1,3 +1,7 @@
+## 1.2.3+26.2
+
+- 🔖 Mettre à jour vers Minecraft 26.2
+
 ## 1.2.2+26.1
 
 - 🔧 Passer le workflow publish à Java 25
