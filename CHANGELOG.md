@@ -1,3 +1,7 @@
+## 1.2.2+26.1
+
+- 🔧 Passer le workflow publish à Java 25
+
 ## 1.2.1+26.1
 
 - 🔧 Passer la CI à Java 25 et supprimer le chemin Java macOS
