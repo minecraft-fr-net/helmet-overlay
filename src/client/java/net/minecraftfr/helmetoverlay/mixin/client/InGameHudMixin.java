@@ -9,30 +9,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Hud;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
-@Mixin(Hud.class)
+@Mixin(Gui.class)
 public class InGameHudMixin {
-  @Inject(method = "extractRenderState", at = @At("HEAD"))
-  public void extractRenderState(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
+  @Inject(method = "render", at = @At("HEAD"))
+  public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
     Minecraft client = Minecraft.getInstance();
 
     if (client != null && client.player != null && client.options.getCameraType().isFirstPerson()) {
       ItemStack helmet = getHelmetFromPlayer(client.player);
       if (!helmet.isEmpty()) {
-        Identifier identifier = getHelmetIdentifier(helmet);
+        ResourceLocation identifier = getHelmetIdentifier(helmet);
 
         if (resourceExists(identifier)) {
-          renderOverlay(context, identifier, 1.0F);
+          renderOverlay(guiGraphics, identifier, 1.0F);
         }
       }
     }
@@ -42,13 +41,13 @@ public class InGameHudMixin {
     return player.getItemBySlot(EquipmentSlot.HEAD);
   }
 
-  private Identifier getHelmetIdentifier(ItemStack helmet) {
+  private ResourceLocation getHelmetIdentifier(ItemStack helmet) {
     String helmet_texture_name = BuiltInRegistries.ITEM.getKey(helmet.getItem()).getPath();
     String texture_path = "textures/misc/" + helmet_texture_name + "_overlay.png";
-    return Identifier.withDefaultNamespace(texture_path);
+    return ResourceLocation.withDefaultNamespace(texture_path);
   }
 
-  private boolean resourceExists(Identifier identifier) {
+  private boolean resourceExists(ResourceLocation identifier) {
     ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
     try {
       Optional<Resource> resource = resourceManager.getResource(identifier);
@@ -58,11 +57,11 @@ public class InGameHudMixin {
     }
   }
 
-  private void renderOverlay(GuiGraphicsExtractor context, Identifier texture, float opacity) {
-    int width = context.guiWidth();
-    int height = context.guiHeight();
+  private void renderOverlay(GuiGraphics guiGraphics, ResourceLocation texture, float opacity) {
+    int width = guiGraphics.guiWidth();
+    int height = guiGraphics.guiHeight();
     int alpha = Math.min(255, Math.max(0, (int) (opacity * 255.0F)));
     int color = (alpha << 24) | 0xFFFFFF;
-    context.blit(RenderPipelines.GUI_TEXTURED, texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
+    guiGraphics.blit(texture, 0, 0, 0.0F, 0.0F, width, height, width, height, color);
   }
 }
