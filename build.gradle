@@ -49,6 +49,8 @@ fabricApi {
 
 afterEvaluate {
 	loom.runs.getByName("clientGameTest").vmArg("-Xmx2G")
+	// Crée automatiquement les templates manquants au lieu d'échouer
+	loom.runs.getByName("clientGameTest").vmArg("-Dfabric.client.gametest.testModResourcesPath=${projectDir}/src/gametest/resources")
 }
 
 processResources {
