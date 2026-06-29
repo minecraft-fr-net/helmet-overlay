@@ -36,7 +36,6 @@ FACE_SIZE     = 8   # Taille de la face (carré 8×8 en résolution 16)
 DEFAULT_OUTPUT_SIZE = 512
 MAX_ALPHA        = 217   # ~85 % d'opacité max — identique aux overlays existants
 BLUR_RADIUS_PCT  = 0.0   # 0 = pas de flou, pixels nets (mettre ex. 0.004 pour adoucir légèrement)
-VIGNETTE_POWER   = 1.8   # Exposant du dégradé radial (plus élevé = bords plus marqués)
 
 
 def _load_face(path: str, face_x: int, face_y: int, face_size: int) -> Image.Image:
@@ -96,20 +95,12 @@ def generate_overlay(
         result = result.filter(ImageFilter.GaussianBlur(radius=blur_radius))
 
     # ── Assombrissement : couleur × 0.25 (teinte préservée) ──
+    # Alpha fixe sur tous les pixels solides — pas de vignette radiale
     arr = np.array(result, dtype=np.float32)
     arr[:, :, 0] *= 0.25
     arr[:, :, 1] *= 0.25
     arr[:, :, 2] *= 0.25
-
-    # ── Vignette radiale : centre transparent → bords opaques ──
-    y_idx, x_idx = np.mgrid[0:output_size, 0:output_size]
-    cx, cy = output_size / 2.0, output_size / 2.0
-    dist = np.sqrt((x_idx - cx) ** 2 + (y_idx - cy) ** 2)
-    max_dist = np.sqrt(cx ** 2 + cy ** 2)
-    vignette = np.clip(dist / max_dist, 0.0, 1.0) ** VIGNETTE_POWER
-
-    # ── Plafond d'opacité + vignette ──
-    arr[:, :, 3] = np.minimum(arr[:, :, 3] * vignette, MAX_ALPHA)
+    arr[:, :, 3] = np.where(arr[:, :, 3] > 0, MAX_ALPHA, 0)
     arr = arr.astype(np.uint8)
 
     out = Image.fromarray(arr)
