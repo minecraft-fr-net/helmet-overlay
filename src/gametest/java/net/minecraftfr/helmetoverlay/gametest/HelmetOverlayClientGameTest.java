@@ -44,8 +44,8 @@ public class HelmetOverlayClientGameTest implements FabricClientGameTest {
 				sp.getClientLevel().waitForChunksRender();
 
 				context.runOnClient((Minecraft client) -> {
-					client.gui.hud.getChat().clearMessages(false);
-					client.gui.toastManager().clear();
+					client.gui.getChat().clearMessages(false);
+					client.getToastManager().clear();
 				});
 				context.waitTicks(2);
 
