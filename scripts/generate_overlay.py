@@ -95,8 +95,13 @@ def generate_overlay(
     if blur_radius > 0:
         result = result.filter(ImageFilter.GaussianBlur(radius=blur_radius))
 
+    # ── Assombrissement : couleur × 0.25 (teinte préservée) ──
+    arr = np.array(result, dtype=np.float32)
+    arr[:, :, 0] *= 0.25
+    arr[:, :, 1] *= 0.25
+    arr[:, :, 2] *= 0.25
+
     # ── Vignette radiale : centre transparent → bords opaques ──
-    # Simule l'ouverture de la visière du casque
     y_idx, x_idx = np.mgrid[0:output_size, 0:output_size]
     cx, cy = output_size / 2.0, output_size / 2.0
     dist = np.sqrt((x_idx - cx) ** 2 + (y_idx - cy) ** 2)
@@ -104,7 +109,6 @@ def generate_overlay(
     vignette = np.clip(dist / max_dist, 0.0, 1.0) ** VIGNETTE_POWER
 
     # ── Plafond d'opacité + vignette ──
-    arr = np.array(result, dtype=np.float32)
     arr[:, :, 3] = np.minimum(arr[:, :, 3] * vignette, MAX_ALPHA)
     arr = arr.astype(np.uint8)
 
